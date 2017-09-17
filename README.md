@@ -8,17 +8,19 @@ Go installed: https://golang.org/doc/install
 
 # Usage
 
+Run all tests
+
 ```
 make test
 ```
 
-Run all tests
+Build the project
 
 ```
 make build
 ```
 
-Build the project
+Run project
 
 ```
 make run GOFLAGS="-input=test.csv -workers=8"
