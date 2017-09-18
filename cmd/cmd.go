@@ -15,11 +15,11 @@ import (
 
 // define vars
 var (
-	Layout               = "2006-01-02"        // Layout for datetime format csv
-	ResultFile           = "result.csv"        // result file name
-	TempFolder           = "./tmp"             // folder temp
-	PhoneNumberText      = "PHONE_NUMBER"      // text of phone number stored in result file
-	ReactivationDateText = "REACTIVATION_DATE" // text of reactivation date stored in result file
+	Layout                 = "2006-01-02"           // Layout for datetime format csv
+	ResultFile             = "result.csv"           // result file name
+	TempFolder             = "./tmp"                // folder temp
+	PhoneNumberText        = "PHONE_NUMBER"         // text of phone number stored in result file
+	RealActivationDateText = "REAL_ACTIVATION_DATE" // text of reactivation date stored in result file
 )
 
 // osFS implements fileSystem using the local disk.
@@ -57,7 +57,12 @@ func Preprocessing(f io.Reader) ([]string, error) {
 	var fs fileSystem = osFS{}
 	var mf = make(map[string]file)
 
-	r.Read()
+	_, err := r.Read()
+	if err != nil {
+		logrus.WithFields(lf).WithError(err).Error("failed to read csv file, first row")
+		return nil, err
+	}
+
 	for {
 		record, err := r.Read()
 		if err == io.EOF {
@@ -112,7 +117,7 @@ func ProcessOneFile(fileName string) (*Result, error) {
 // getAllRowsOneFile returns all rows in single file, merged
 // into a []Row model
 func getAllRowsOneFile(fileName string) ([]Row, error) {
-	lf := logrus.Fields{"func": "cmd.ProcessOneFile"}
+	lf := logrus.Fields{"func": "cmd.getAllRowsOneFile"}
 
 	f, err := os.Open(fmt.Sprintf("%s/%s", TempFolder, fileName))
 	if err != nil {

@@ -1,12 +1,15 @@
 package cmd
 
 import (
+	"encoding/csv"
 	"errors"
 	"fmt"
 	"io"
 	"os"
 	"reflect"
 	"testing"
+
+	"golang.org/x/sync/syncmap"
 )
 
 var (
@@ -94,10 +97,6 @@ type MockFile struct {
 	file
 }
 
-type MockFileInfo struct {
-	os.FileInfo
-}
-
 func (mf *MockFileSystem) Create(fileName string) (file, error) {
 	if mf.SimulateCreateError {
 		return nil, ErrCreate
@@ -148,4 +147,51 @@ func TestCreateFile(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestWriteToCSV(t *testing.T) {
+	tempFile := "temp.csv"
+	f, err := os.Create(tempFile)
+	if err != nil {
+		t.Fatalf("failed to setup, create temp file, err = %v", err)
+	}
+
+	key := "098812345"
+	result := &Result{"2015-02-02"}
+
+	ms := &syncmap.Map{}
+	ms.Store(key, result)
+
+	err = writeToCSV(f, ms)
+	if err != nil {
+		t.Errorf("writeToCSV() failed, err = %v", err)
+	}
+
+	f.Seek(0, 0)
+
+	r := csv.NewReader(f)
+
+	r1, err := r.Read()
+	if err != nil {
+		t.Fatalf("read temp file failed, err = %v", err)
+	}
+
+	r2, err := r.Read()
+	if err != nil {
+		t.Fatalf("read temp file failed, err = %v", err)
+	}
+
+	if r1[0] != PhoneNumberText || r1[1] != RealActivationDateText {
+		t.Errorf("data written not expected, expected = %s %s, got %s %s", PhoneNumberText, RealActivationDateText, r1[0], r1[1])
+	}
+
+	if r2[0] != key || r2[1] != result.RealActivationDate {
+		t.Errorf("data written not expected, expected = %s %s, got %s %s", key, result.RealActivationDate, r2[0], r2[1])
+	}
+
+	err = os.Remove(tempFile)
+	if err != nil {
+		t.Fatalf("failed to clean up, err = %v", err)
+	}
+
 }

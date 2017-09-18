@@ -20,7 +20,7 @@ func writeToCSV(fi file, ms *syncmap.Map) error {
 	writer := csv.NewWriter(fi)
 	defer writer.Flush()
 
-	writer.Write([]string{PhoneNumberText, ReactivationDateText})
+	writer.Write([]string{PhoneNumberText, RealActivationDateText})
 
 	ms.Range(func(k, v interface{}) bool {
 		row, ok := v.(*Result)

@@ -15,7 +15,7 @@ func main() {
 	lf := logrus.Fields{"func": "main"}
 
 	input := flag.String("input", "", "input file location")
-	workers := flag.Int("worker", 8, "number of workers")
+	workers := flag.Int("workers", 8, "number of workers")
 
 	flag.Parse()
 
