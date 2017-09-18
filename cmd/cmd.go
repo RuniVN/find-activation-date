@@ -106,7 +106,7 @@ func Preprocessing(f io.Reader) ([]string, error) {
 func ProcessOneFile(fileName string) (*Result, error) {
 	lf := logrus.Fields{"func": "cmd.ProcessOneFile"}
 
-	rows, err := getAllRowsOneFile(fileName)
+	rows, err := getAllRowsOneFile(fmt.Sprintf("%s/%s", TempFolder, fileName))
 	if err != nil {
 		logrus.WithFields(lf).WithError(err).Error("failed to get all rows of one file")
 		return nil, err
@@ -116,12 +116,12 @@ func ProcessOneFile(fileName string) (*Result, error) {
 
 // getAllRowsOneFile returns all rows in single file, merged
 // into a []Row model
-func getAllRowsOneFile(fileName string) ([]Row, error) {
+func getAllRowsOneFile(filePath string) ([]Row, error) {
 	lf := logrus.Fields{"func": "cmd.getAllRowsOneFile"}
 
-	f, err := os.Open(fmt.Sprintf("%s/%s", TempFolder, fileName))
+	f, err := os.Open(filePath)
 	if err != nil {
-		logrus.WithFields(lf).WithError(err).Errorf("failed to open file %s", fileName)
+		logrus.WithFields(lf).WithError(err).Errorf("failed to open file %s", filePath)
 		return nil, err
 	}
 	defer f.Close()

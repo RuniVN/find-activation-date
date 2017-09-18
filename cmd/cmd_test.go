@@ -87,6 +87,26 @@ func TestExportCSV(t *testing.T) {
 	}
 }
 
+func TestGetAllRowsOneFile(t *testing.T) {
+	tempFile := "tmp.csv"
+	f, err := os.Create(tempFile)
+	if err != nil {
+		t.Fatalf("failed to create file %s, err = %v", tempFile, err)
+	}
+
+	f.Write([]byte("2014-02-02, 2015-02-02"))
+
+	rows, err := getAllRowsOneFile(tempFile)
+	if err != nil {
+		t.Fatalf("getAllRowsOneFile() failed, err = %v", err)
+	}
+
+	expected := 1
+	if len(rows) != expected {
+		t.Errorf("getAllRowsOneFile() failed, expected length = %d, got %d", expected, len(rows))
+	}
+}
+
 func TestFindTheLatestActivation(t *testing.T) {
 	realActivationDate := "2015-05-02"
 	rows := []Row{
