@@ -97,6 +97,7 @@ type MockFile struct {
 	file
 }
 
+// Create creates a mock file system
 func (mf *MockFileSystem) Create(fileName string) (file, error) {
 	if mf.SimulateCreateError {
 		return nil, ErrCreate
